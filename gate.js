@@ -1,7 +1,8 @@
 'use strict';
 (() => {
  // Sydney is on daylight saving time (UTC+11) on this date.
- const unlockAt = Date.parse('2026-10-05T00:00:00+11:00');
+ // const unlockAt = Date.parse('2026-10-05T00:00:00+11:00');
+ const unlockAt = 0;
  const el = id => document.getElementById(id);
  let opening = false, opened = false, timer;
  const loaded = new Set();
