@@ -6,12 +6,22 @@
 <meta name="description" content="A little birthday surprise, sent with a whole lot of love.">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23b63258'/%3E%3Cpath d='M16 25L5 14C0 6 12 2 16 10C20 2 32 6 27 14Z' fill='%23fff0e6'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="animation.css"><script src="story.js" defer></script><script src="sound.js" defer></script><script src="app.js" defer></script>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="animation.css"><link rel="stylesheet" href="gate.css"><script src="gate.js" defer></script>
 </head>
 <body>
 <div class="confetti" aria-hidden="true"></div>
 <header><a class="brand" href="./" aria-label="Restart the birthday surprise"><span aria-hidden="true">♡</span> a little birthday hug</a><span class="postmark">SENT WITH LOVE</span></header>
-<main>
+<section id="birthday-gate" class="birthday-gate" aria-labelledby="gate-title">
+<p class="eyebrow">A SECRET DELIVERY FOR BUBUUU</p>
+<div class="gate-art" role="img" aria-label="Dudu is guarding a little birthday gift"><div class="gate-dudu"></div><span class="gate-gift" aria-hidden="true">🎁</span><span class="gate-whisper">No peeking… ♡</span></div>
+<h1 id="gate-title">A little early.<br>A lot of <em>love.</em></h1>
+<p class="gate-copy">Dudu is keeping your surprise safe until your birthday.</p>
+<div id="countdown" class="countdown" role="timer" aria-label="Time until your birthday surprise opens"><div><strong id="gate-days">—</strong><span>days</span></div><div><strong id="gate-hours">—</strong><span>hours</span></div><div><strong id="gate-minutes">—</strong><span>minutes</span></div><div><strong id="gate-seconds">—</strong><span>seconds</span></div></div>
+<p class="gate-date">Opens 5 October 2026 · 12:00 AM Sydney time</p>
+<p id="gate-status" class="hint" role="status">Your gift will open here automatically. ♡</p>
+<button id="gate-retry" class="primary" hidden type="button">Try opening again</button>
+</section>
+<main id="birthday-content" hidden>
 <div class="story-meta"><span id="chapter">A SPECIAL DELIVERY</span><span id="count">01 / 05</span></div>
 <section class="scene" id="scene" aria-labelledby="title">
 <div class="copy"><p class="eyebrow" id="eyebrow">PSST… BUBUUU!</p><h1 id="title" tabindex="-1">Do you want to see<br>a <em>special gift</em><br>for you?</h1><p class="intro" id="description">Dudu has been keeping a little secret…</p><div id="extra"></div><div class="actions"><button id="next" class="primary">YES <span aria-hidden="true">♡</span></button><button id="intro-no" class="intro-no" type="button">No</button><button id="back" class="back" hidden>Back</button></div><p class="hint" id="hint" role="status">Made for you. Best opened with a smile.</p></div>
@@ -19,5 +29,5 @@
 </section>
 <footer><div class="progress" aria-label="Birthday story progress"><span class="active"></span><span></span><span></span><span></span><span></span></div><p>Different skies. Same little us. <span aria-hidden="true">♡</span></p><span class="edition">JUST FOR YOU</span></footer>
 </main>
-<noscript><p class="no-script">Please enable JavaScript to open the interactive birthday surprise. Happy birthday, my love! Sending you the biggest hug across the miles.</p></noscript>
+<noscript><p class="no-script">Please enable JavaScript for the birthday countdown and surprise. Opens 5 October 2026 at midnight Sydney time.</p></noscript>
 </body></html>

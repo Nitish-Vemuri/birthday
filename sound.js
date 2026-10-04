@@ -25,7 +25,7 @@ function makeSceneScore(id,durationMs){
   [0.4,1.1,1.8,2.5].forEach(t=>add(t,.18,180,115,.065,'triangle'));add(3.1,.6,140,820,.075,'sine');[784,1046,1318].forEach((f,i)=>bell(4.1+i*.2,f,.05));
  }else if(id==='birthday'){
   [523,659,784,1046].forEach((f,i)=>bell(3.5+i*.3,f,.06));
- }else if(id==='letter'||id==='notes'){
+ }else if(id==='hug'||id==='notes'){
   [261.63,329.63,392].forEach((f,i)=>add(.5+i*.3,1.8,f,f,.014,'sine'));
  }
  return notes.sort((a,b)=>a.at-b.at);
