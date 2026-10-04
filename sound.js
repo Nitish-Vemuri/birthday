@@ -21,6 +21,8 @@ function makeSceneScore(id,durationMs){
   babble(.15,1.95);add(2.38,.3,620,300,.085,'sawtooth',true);add(2.85,.2,400,270,.065,'sawtooth',true);[523,659,784].forEach((f,i)=>bell(4.3+i*.16,f,.055));babble(6.1,7.8,470);
  }else if(id==='coffee'){
   babble(.12,1.4);bell(1.65,1174,.035);bell(1.9,1568,.025);babble(2.8,3.65,500,.038);babble(4.15,4.95,230,.065);bell(5.3,1318,.04);babble(5.9,7.5,460,.065);
+  }else if(id==='emergency'){
+  bell(.12,880,.05);bell(.35,1046,.05);for(let t=1;t<2.9;t+=.19)add(t,.07,150,70,.05,'triangle');add(2.95,.4,600,130,.06);[523,659,784].forEach((f,i)=>bell(3.65+i*.18,f,.05));babble(4.6,5.4,260,.05);
  }else if(id==='parcel'){
   [0.4,1.1,1.8,2.5].forEach(t=>add(t,.18,180,115,.065,'triangle'));add(3.1,.6,140,820,.075,'sine');[784,1046,1318].forEach((f,i)=>bell(4.1+i*.2,f,.05));
  }else if(id==='birthday'){

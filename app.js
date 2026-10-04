@@ -2,7 +2,7 @@
 const $ = id => document.getElementById(id);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let step=0,wished=false,raf=0,startTime=0,elapsed=0,pausedAt=0,ready=false,imageFailure=false,confettiTimer;
-let introChoice='ask';
+let introChoice='ask',hugCalled=false;
 const sceneDuration=()=>step===0&&introChoice==='yes'?1700:STORY[step].duration;
 const soundId=()=>step===0?'welcome_'+introChoice:STORY[step].id;
 const opened=new Set();
@@ -11,7 +11,7 @@ const mix=(a,b,p)=>a+(b-a)*clamp(p);
 const ease=p=>1-Math.pow(1-clamp(p),3);
 const beat=(t,speed=150)=>Math.floor(t/speed)%2;
 function visible(id,show){$(id).hidden=!show;}
-function actor(id,pose,x,y,{flip=false,rotate=0,scale=1,front=2,run=false}={}){
+function actor(id,pose,x,y,{flip=id==='bubu',rotate=0,scale=1,front=2,run=false}={}){
  const el=$(id),sprite=el.firstElementChild;el.hidden=false;el.style.left=x+'%';el.style.top=y+'%';el.style.zIndex=front;el.style.transform=`translate(-50%,-50%) rotate(${rotate}deg) scale(${flip?-scale:scale},${scale})`;
  sprite.classList.toggle('running',run);el.classList.toggle('is-running',run);const columns=id==='pair'?2:4,rows=(id==='pair'||run)?2:3;sprite.style.backgroundPosition=`${(pose%columns)*100/(columns-1)}% ${Math.floor(pose/columns)*100/(rows-1)}%`;
 }
@@ -44,6 +44,13 @@ const scenes={
   else if(t<5300){actor('bubu',8+beat(t,350),64,61,{scale:.87,front:1});actor('dudu',0,46,67,{front:3});label('bubble-b','Can you order mine…?',65,36);if(t>4100)label('bubble-a','Two coffees, please.',27,20);}
   else{const p=ease((t-5300)/2000);actor('dudu',0,mix(46,29,p),66);actor('bubu',5+beat(t,180),mix(64,62,p),64);label('bubble-b','Anyway, where was I?',62,31);label('bubble-a','☕',26,40);}
  },
+ emergency(t){
+  if(!hugCalled){actor('bubu',8,68,64);label('bubble-b','One hug, please?',66,25);heart(38,63,.8);return;}
+  if(t<900){actor('bubu',10,68,64);heart(46,61,.85);label('bubble-b','Duduuu!',68,25);}
+  else if(t<2900){const p=(t-900)/2000;actor('dudu',Math.floor(t/100)%4,mix(-20,40,p),64-Math.sin(t/100),{run:true,rotate:5});actor('bubu',6,68,64);label('bubble-a','Coming!',29,25);}
+  else if(t<3600){actor('dudu',3,mix(40,44,ease((t-2900)/700)),64,{rotate:-8});actor('bubu',10,68,64);label('bubble-a','Made it!',30,25);}
+  else{actor('pair',0,53,62,{scale:1+Math.sin(clamp((t-3600)/3200)*Math.PI)*.06});heart(53,23,.65);label('bubble-a','You called? ♡',52,34);}
+ },
  parcel(t){
   if(t<2200){actor('pair',1,42,62,{scale:.92,rotate:Math.sin(t/180)*2});label('bubble-a','It’ll fit. Probably.',43,22);}
   else if(t<3700){actor('pair',2,42,62,{scale:.94,rotate:Math.sin(t/100)*2});label('bubble-a',t<3100?'Just… a little…':'Oh!',43,22);}
@@ -59,7 +66,7 @@ const scenes={
 };
 function draw(time){resetStage();const page=STORY[step];scenes[page.id](Math.min(time,sceneDuration()));$('time-fill').style.transform=`scaleX(${clamp(time/sceneDuration())})`;}
 function tick(now){elapsed=Math.min(now-startTime,sceneDuration());draw(reducedMotion.matches?sceneDuration():elapsed);raf=elapsed<sceneDuration()?requestAnimationFrame(tick):0;if(!raf){storyAudio.finished();if(step===0&&introChoice==='yes'){step=1;render();}}}
-function play(){storyAudio.stop();cancelAnimationFrame(raf);raf=0;pausedAt=0;elapsed=0;resetStage();if(!ready)return;if(reducedMotion.matches&&!(step===0&&introChoice==='yes')){elapsed=sceneDuration();draw(elapsed);storyAudio.play(soundId(),sceneDuration());return;}startTime=performance.now();draw(reducedMotion.matches?sceneDuration():0);if(document.hidden)pausedAt=startTime;else{raf=requestAnimationFrame(tick);storyAudio.play(soundId(),sceneDuration());}}
+function play(){storyAudio.stop();cancelAnimationFrame(raf);raf=0;pausedAt=0;elapsed=0;resetStage();if(!ready)return;if(STORY[step].id==='emergency'&&!hugCalled){draw(0);return;}if(reducedMotion.matches&&!(step===0&&introChoice==='yes')){elapsed=sceneDuration();draw(elapsed);storyAudio.play(soundId(),sceneDuration());return;}startTime=performance.now();draw(reducedMotion.matches?sceneDuration():0);if(document.hidden)pausedAt=startTime;else{raf=requestAnimationFrame(tick);storyAudio.play(soundId(),sceneDuration());}}
 function chooseIntro(choice){
  if(step!==0||introChoice==='yes')return;introChoice=choice;storyAudio.prime();
  $('intro-no').disabled=choice==='yes';$('next').disabled=choice==='yes';$('replay').disabled=choice==='yes'||!ready;
@@ -77,10 +84,10 @@ function render(focus=true){
  if(step===0)introChoice='ask';$('intro-no').hidden=step!==0;$('intro-no').disabled=false;$('next').disabled=false;$('replay').disabled=!ready;
  $('chapter').textContent=p.chapter;$('count').textContent=`${String(step+1).padStart(2,'0')} / ${String(STORY.length).padStart(2,'0')}`;$('eyebrow').textContent=p.eyebrow;$('title').innerHTML=p.title;$('description').innerHTML=p.description;$('description').hidden=!p.description;$('next').innerHTML=p.button+' <span aria-hidden="true">♡</span>';$('back').hidden=step===0;$('hint').textContent=p.hint;$('extra').replaceChildren();$('scene').dataset.kind=p.id;$('stage').setAttribute('aria-label',p.alt);$('scene-caption').textContent=imageFailure?p.alt:p.caption;$('scene-caption').hidden=!imageFailure&&!p.caption;$('duration').textContent=(p.duration/1000).toFixed(1)+' sec';
  document.querySelectorAll('.progress span').forEach((el,i)=>el.classList.toggle('active',i===step));document.querySelector('.progress').setAttribute('aria-label',`Chapter ${step+1} of ${STORY.length}`);
- if(p.id==='notes')addNotes();if(p.id==='birthday')addWish();
+ if(p.id==='emergency'){hugCalled=false;const b=document.createElement('button');b.id='hug-call';b.className='hug-call';b.textContent='♥  Emergency hug';b.onclick=()=>{hugCalled=true;storyAudio.prime();play();$('hint').textContent='Hug requested. Express delivery! ♡';};$('extra').append(b);}if(p.id==='notes')addNotes();if(p.id==='birthday')addWish();
  $('scene').classList.remove('enter');void $('scene').offsetWidth;$('scene').classList.add('enter');play();if(focus){$('title').focus({preventScroll:true});$('scene').scrollIntoView({block:'start',behavior:'instant'});}
 }
-$('next').addEventListener('click',()=>{storyAudio.prime();if(step===0){chooseIntro('yes');return;}if(step===STORY.length-1){play();celebrate();$('hint').textContent='One more hug, just for you. ♡';return;}step++;render();});$('intro-no').addEventListener('click',()=>chooseIntro('no'));$('back').addEventListener('click',()=>{storyAudio.prime();if(step>0){step--;render();}});$('replay').addEventListener('click',()=>{storyAudio.prime();play();});
+$('next').addEventListener('click',()=>{storyAudio.prime();if(step===0){chooseIntro('yes');return;}if(step===STORY.length-1){play();celebrate();$('hint').textContent='One more hug, just for you. ♡';return;}step++;render();});$('intro-no').addEventListener('click',()=>chooseIntro('no'));$('back').addEventListener('click',()=>{storyAudio.prime();if(step>0){step--;render();}});$('replay').addEventListener('click',()=>{storyAudio.prime();if(STORY[step].id==='emergency')hugCalled=true;play();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){storyAudio.stop();if(raf){pausedAt=performance.now();cancelAnimationFrame(raf);raf=0;}}else if(pausedAt&&elapsed<sceneDuration()){startTime+=performance.now()-pausedAt;pausedAt=0;raf=requestAnimationFrame(tick);storyAudio.play(soundId(),sceneDuration(),elapsed);}});
 reducedMotion.addEventListener('change',play);
 $('sound-toggle').addEventListener('click',()=>{if(storyAudio.toggle()&&ready)storyAudio.play(soundId(),sceneDuration(),reducedMotion.matches?0:elapsed);});
